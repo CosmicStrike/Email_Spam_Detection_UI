@@ -1,0 +1,5 @@
+seaborn
+pandas
+numpy
+nltk
+scikit-learn
