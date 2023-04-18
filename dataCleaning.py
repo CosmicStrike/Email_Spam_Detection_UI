@@ -1,77 +1,80 @@
-# %% [markdown]
-# ## Email Spam detection using NLP
-
-# %%
 import pandas as pd
 import re
-import seaborn as sns
-
-# %%
-df = pd.read_csv("Dataset/spam.csv",encoding="ISO-8859-1")
-
-
-# %%
-df.drop(columns="Unnamed: 2",inplace=True, axis=1)
-df.drop(columns="Unnamed: 3",inplace=True, axis=1)
-df.drop(columns="Unnamed: 4",inplace=True, axis=1)
-
-# %%
-print(df.head())
-print(df.describe())
-
-# %%
-# re_pattren = r'\b[A-Za-z0-9]+\b'
-
-# def RE(s:str) -> str:
-#     a = re.findall(re_pattren,s)
-#     ans = ' '.join(a)
-#     return ans
-
-# %%
-# l = []
-# for i in range(df["MESSAGE"].count()):
-#     l.append(RE(df["MESSAGE"][i]))
-
-# %%
-# df["Lvl1"] = l
-
-# %%
-# Perform Lemmation
 import nltk
-# nltk.download("wordnet") --- lemmatization -- downloaded
-# nltk.download("punkt") --- tokenizor downloaded
-# nltk.download("stopword") -- downloaded
-# nltk.download('omw-1.4') - --lemmatization - -downloaded
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
 
-# %%
+re_pattren = r'\b[A-Za-z0-9]+\b'
+def RE(s:str) -> str:
+    a = re.findall(re_pattren,s)
+    ans = ' '.join(a)
+    return ans
+
+nltk.download("wordnet") #--- lemmatization
+nltk.download("punkt") #--- tokenizor 
+nltk.download("stopword") 
+nltk.download('omw-1.4') #---lemmatization
+
+
+print()
+print()
+
+sampleRow = 6
+
+df = pd.DataFrame(pd.read_csv("spam.csv",encoding="ISO-8859-1"))
+print(len(df))
+# Check for empty columns
+def Remove_Empty_Columns(df):
+    empty_cols = []
+    for col in df.columns:
+        if df[col].isnull().sum():
+            empty_cols.append(col)
+
+    # drop empty columns
+    df.drop(columns=empty_cols, axis=1, inplace=True)
+
+Remove_Empty_Columns(df)
+print("Original Text -> ", df["v2"][sampleRow])
+
+
+
+# Length of message is also important factor
 def Calculate_Length(df):
     leng = []
+    # print("COunt : ", df["v2"].count())
     for i in range(df["v2"].count()):
         leng.append(len(df["v2"][i]))
-    # print(leng)
     df["Length"] = leng
+
 Calculate_Length(df)
-
-# %%
-sns.distplot(a=df[df['v1'] == "ham"].Length, kde=False)
+print("Length of Text -> ", df["Length"][sampleRow])
 
 
-# %%
-sns.distplot(a=df[df['v1'] == "spam"].Length, kde=False)
+
+# Get the data with only alphanumeric characters; Remove quotes, commas,....
+def Convert_To_AlphaNumeric(df):
+    l = []
+    for i in range(df["v2"].count()):
+        l.append(RE(df["v2"][i]).lower())# Convert the data into lower case
+    df["Message"] = l
+
+Convert_To_AlphaNumeric(df)
+print("Only AlphaNumeric Text -> ", df["Message"][sampleRow])
 
 
-# %%
+
 from nltk import word_tokenize
 def Tokenize(df):
     tokens = []
-    for i in range(df["v2"].count()):
-        tokens.append(word_tokenize(df["v2"][i]))
+    for i in range(df["Message"].count()):
+        tokens.append(word_tokenize(df["Message"][i]))
     df["tokens"] = tokens
 Tokenize(df)
-print("Original Text -> ", df["v2"][4])
-print("Tokenized Text -> ", df["tokens"][4])
+print("Tokenized Text -> ", df["tokens"][sampleRow])
 
-# %%
+
 from nltk.corpus import stopwords
 def RemoveStopword(df):
     stop_words = set(stopwords.words("english"))
@@ -86,12 +89,9 @@ def RemoveStopword(df):
     df["Filtered-Stopwords"] = filters
 
 RemoveStopword(df)
-
-print("Tokenized Text -> ", df["tokens"][4])
-print("After removing Stopwords -> ", df["Filtered-Stopwords"][4])
+print("Stopwords Removed -> ", df["Filtered-Stopwords"][sampleRow])
 
 
-# %%
 lem = nltk.WordNetLemmatizer()
 def Lemmantize_Text(df):
     lemmantized = []
@@ -105,137 +105,64 @@ def Lemmantize_Text(df):
     df["Lemmanted"] = lemmantized
 
 Lemmantize_Text(df)
-print("After removing Stopwords -> ", df["Filtered-Stopwords"][4])
-print("Lemmatization -> ", df["Lemmanted"][4])
 
-# %%
+print("Lemmatization -> ", df["Lemmanted"][sampleRow])
+
+
 def FinalizeText(df):
     text = []
     for i in range(df["Lemmanted"].count()):
         t = ' '.join(df["Lemmanted"][i])
         text.append(t)
-    df["Final Text"] = text
-    # df.head()
+    df["Processed_Text"] = text
 
 FinalizeText(df)
-print("Original text -> ",df["v2"][4])
-print("Processed text -> ",df["Final Text"][4])
+print("Original text -> ",df["v2"][sampleRow])
+print("Processed text -> ",df["Processed_Text"][sampleRow])
 
 
-# %%
-for i in range(df["v1"].count()):
-    if df["v1"][i] == "ham":
-        df["v1"][i] = int(0)
-    else:
-        df["v1"][i] = int(1)
+#Encoding the output using label encoder
+label_encoder = LabelEncoder()
+encoded = label_encoder.fit_transform(df["v1"])
+df["labels"] = encoded
 
-df.head()
 
-# %%
 def RemoveUnwantedColumn(df):
-    # print(df.head())
-    df.drop(['tokens', 'Filtered-Stopwords','Lemmanted'], axis=1, inplace=True)
+    df.drop(['v1','v2', 'Message','tokens', 'Filtered-Stopwords','Lemmanted'], axis=1, inplace=True)
 RemoveUnwantedColumn(df)
 
-
-# %%
-from sklearn.model_selection import train_test_split
-
-y = pd.DataFrame(df["v1"])
-df.drop(columns="v1", axis=1, inplace=True)
-x = df
-x_train, x_val, y_train, y_val = train_test_split(x,y,train_size=0.8,test_size=0.2,random_state=0)
+print(df.columns)
 
 
-# %%
-x_val.head()
+y = df["labels"]
+x = df.drop(columns="labels", axis=1)
+x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,test_size=0.2,random_state=10)
 
-# %%
-# Count vertorization
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+def TF_IDF(dataframe):# Takes the dataframe with columns= Length, Processed_Text
+    TF = TfidfVectorizer(use_idf=True, max_features=3000)
+    feq = pd.DataFrame(TF.fit_transform(dataframe["Processed_Text"]).todense(), columns=[TF.get_feature_names_out()])
+    print(TF.get_feature_names_out())
+    feq["Length"] = np.array(dataframe["Length"])
+    feq["Length"].replace('NaN',230, inplace=True)
+    # print("Count: ",feq["Length"].isna().sum())
+    # print(feq)
+    return feq
 
-cv = CountVectorizer(max_features=5000)
-temp_train = cv.fit_transform(x_train['Final Text']).toarray()
-temp_val = cv.transform(x_val['Final Text']).toarray()
+xtrain = TF_IDF(x_train)
+xtest = TF_IDF(x_test)
 
-
-# %%
-# countVect= CountVectorizer()
-# text = ["The dark flames of elixer becomes more dark - a monotonous"]
-# cv = countVect.fit_transform(text).toarray()
-# print(cv[0])
-# print("Totol words are 12")
-# print("Length of array is ", len(cv[0]))
-
-# %%
-# tf = TfidfTransformer()
-# transform = tf.fit_transform(cv)
-# print("TF-IDF : ",transform.todense())
-# print("Count Vector :",cv[0])
-
-# %%
-# TF-IDF
-tf = TfidfTransformer()
-temp_train = tf.fit_transform(temp_train)
-temp_val = tf.transform(temp_val)
+print(xtrain.shape)
+print(xtest.shape)
 
 
-# %%
-#merging temp datafram with original dataframe
-temp_train = pd.DataFrame(temp_train.toarray(), index=x_train.index)
-temp_val = pd.DataFrame(temp_val.toarray(), index=x_val.index)
-x_train = pd.concat([x_train, temp_train], axis=1, sort=False)
-x_val = pd.concat([x_val, temp_val], axis=1, sort=False)
-
-x_train.head()
-
-# %%
-#dropping the final_text column
-x_train.drop(['Final Text'], axis=1, inplace=True)
-x_val.drop(['Final Text'], axis=1, inplace=True)
-
-x_train.head()
-
-# %%
-#dropping the v2 column
-x_train.drop(['v2'], axis=1, inplace=True)
-x_val.drop(['v2'], axis=1, inplace=True)
-
-# %%
-x_train.head()
-
-# %%
-#converting the labels to int datatype (for model training)
-y_train = y_train.astype(int)
-y_val = y_val.astype(int)
 
 
-# %%
-def Vectorize_And_TFIDFTranform(df):
-    cv = CountVectorizer(max_features=5000)
-    temp_train = cv.fit_transform(df['Final Text']).toarray()
-    # print("temp_train ", temp_train)
-    tf = TfidfTransformer()
-    temp_train = tf.fit_transform(temp_train)
-    # print("temp_train ", temp_train)
-
-    temp_train = pd.DataFrame(temp_train.toarray())
-    # print("temp_train ", temp_train)
-
-    df = pd.concat([df, temp_train], axis=1, sort=False)
-    # print(df)
-    df.drop(['Final Text'], axis=1, inplace=True)
-    df.drop(['v2'], axis=1, inplace=True)
-    # print(df)
-    return df
-
-# %%
-def PreProcess_Data(dataf):
-    Calculate_Length(dataf)
-    Tokenize(dataf)
-    RemoveStopword(dataf)
-    Lemmantize_Text(dataf)
-    FinalizeText(dataf)
-    RemoveUnwantedColumn(dataf)
-    return Vectorize_And_TFIDFTranform(dataf)
+# def PreProcess_Data(dataf):
+#     Calculate_Length(dataf)
+#     Tokenize(dataf)
+#     RemoveStopword(dataf)
+#     Lemmantize_Text(dataf)
+#     FinalizeText(dataf)
+#     RemoveUnwantedColumn(dataf)
+#     return Vectorize_And_TFIDFTranform(dataf)
     
