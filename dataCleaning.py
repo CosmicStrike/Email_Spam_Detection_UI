@@ -28,6 +28,15 @@ def initialize():
 
     nltk.data.path.append('./nltk_downloads')
 
+def initialize():
+    # --- lemmatization
+    nltk.download("wordnet", download_dir="./nltk_downloads")
+    nltk.download("punkt", download_dir="./nltk_downloads")  # --- tokenizor
+    nltk.download("stopword", download_dir="./nltk_downloads")
+    # ---lemmatization
+    nltk.download('omw-1.4', download_dir="./nltk_downloads")
+
+    nltk.data.path.append('./nltk_downloads')
 
 def load_dataset() -> pd.DataFrame:
     df = pd.DataFrame(pd.read_csv("spam.csv", encoding="ISO-8859-1"))
