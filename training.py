@@ -1,34 +1,55 @@
+import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-# n_estimator - number of trees (decesion tree) in forest
-model = RandomForestClassifier(n_estimators=100)
-print(type(y_train))
-model.fit(x_train, y_train)
-y_preds = model.predict(x_val.values)
-print("Random Forest:", accuracy_score(y_val, y_preds))
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+import pandas as pd
 
-text_df = pd.DataFrame(columns=["v2"])
-text = ["Free entry in 2 a wkly comp to win FA Cup final tkts 21st May 2005. Text FA to 87121 to receive entry question(std txt rate)T&C's apply 08452810075over18'"]
 
-text_df["v2"] = text
-print(text_df)
-text = PreProcess_Data(text_df)
-print("TEXT _> ")
-print(text)
+def TF_IDF(df: pd.DataFrame):  # Takes the dataframe with columns= Length, Processed_Text
+    TF = TfidfVectorizer(use_idf=True, max_features=3000)
+    feq = pd.DataFrame(TF.fit_transform(df["Processed_Text"]).todense(), columns=[
+                       TF.get_feature_names_out()])
+    print(TF.get_feature_names_out())
+    feq["Length"] = np.array(df["Length"])
+    feq["Length"].replace('NaN', 230, inplace=True)
+    # print("Count: ",feq["Length"].isna().sum())
+    # print(feq)
+    return feq
 
-# %%
 
-# %%
-def FitData(dataf,size):
-    for i in range(dataf.shape[1],size+1):
-        dataf[f"{i}"] = 0.0
-FitData(text,5000)
-text.head()
+def model_fit_and_test(df: pd.DataFrame):
+    y = df["labels"]
+    x = df.drop(columns="labels", axis=1)
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, train_size=0.8, test_size=0.2, random_state=10)
 
-# %%
-ans = model.predict(text)
-print(ans)
-if ans:
-    print("Spam")
-else:
-    print("Ham")
+    x_train = TF_IDF(x_train)
+    x_test = TF_IDF(x_test)
+
+    # n_estimator - number of trees (decesion tree) in forest
+    model = RandomForestClassifier(n_estimators=100)
+
+    model.fit(x_train, y_train)
+
+    y_preds = model.predict(x_test.values)
+    rf_accuracy = accuracy_score(y_test, y_preds)
+
+    print(y_preds, rf_accuracy)
+
+    return model, rf_accuracy
+
+
+def test():
+    import dataCleaning
+    import pandas as pd
+    df = pd.read_csv("spam.csv", encoding="ISO-8859-1")
+    dataCleaning.initialize()
+    dataCleaning.clean(df)
+
+    df = pd.read_csv("cleaned.csv")
+    model_fit_and_test(df)
+
+
+if __name__ == '__main__':
+    test()
