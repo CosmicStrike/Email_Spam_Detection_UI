@@ -1,2 +1,5 @@
 venv
 .vscode
+__pycache__
+nltk_downloads
+cleaned.csv
