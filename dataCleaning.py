@@ -1,3 +1,5 @@
+from nltk.corpus import stopwords
+from nltk import word_tokenize
 import pandas as pd
 import re
 import nltk
@@ -7,76 +9,72 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 
 re_pattren = r'\b[A-Za-z0-9]+\b'
-def RE(s:str) -> str:
-    a = re.findall(re_pattren,s)
+
+lem = nltk.WordNetLemmatizer()
+label_encoder = LabelEncoder()
+
+
+def RE(s: str) -> str:
+    a = re.findall(re_pattren, s)
     ans = ' '.join(a)
     return ans
 
-nltk.download("wordnet") #--- lemmatization
-nltk.download("punkt") #--- tokenizor 
-nltk.download("stopword") 
-nltk.download('omw-1.4') #---lemmatization
 
+def initialize():
+    # --- lemmatization
+    nltk.download("wordnet", download_dir="./nltk_downloads")
+    nltk.download("punkt", download_dir="./nltk_downloads")  # --- tokenizor
+    nltk.download("stopword", download_dir="./nltk_downloads")
+    # ---lemmatization
+    nltk.download('omw-1.4', download_dir="./nltk_downloads")
 
-print()
-print()
+    nltk.data.path.append('./nltk_downloads')
+
 
 sampleRow = 6
 
-df = pd.DataFrame(pd.read_csv("spam.csv",encoding="ISO-8859-1"))
-print(len(df))
+
+def load_dataset() -> pd.DataFrame:
+    df = pd.DataFrame(pd.read_csv("spam.csv", encoding="ISO-8859-1"))
+    return df
+
+
 # Check for empty columns
-def Remove_Empty_Columns(df):
+def Remove_Empty_Columns(df: pd.DataFrame):
     empty_cols = []
     for col in df.columns:
         if df[col].isnull().sum():
             empty_cols.append(col)
-
     # drop empty columns
     df.drop(columns=empty_cols, axis=1, inplace=True)
 
-Remove_Empty_Columns(df)
-print("Original Text -> ", df["v2"][sampleRow])
-
-
-
 # Length of message is also important factor
-def Calculate_Length(df):
+
+
+def Calculate_Length(df: pd.DataFrame):
     leng = []
     # print("COunt : ", df["v2"].count())
     for i in range(df["v2"].count()):
         leng.append(len(df["v2"][i]))
     df["Length"] = leng
 
-Calculate_Length(df)
-print("Length of Text -> ", df["Length"][sampleRow])
-
-
 
 # Get the data with only alphanumeric characters; Remove quotes, commas,....
-def Convert_To_AlphaNumeric(df):
+def Convert_To_AlphaNumeric(df: pd.DataFrame):
     l = []
     for i in range(df["v2"].count()):
-        l.append(RE(df["v2"][i]).lower())# Convert the data into lower case
+        l.append(RE(df["v2"][i]).lower())  # Convert the data into lower case
     df["Message"] = l
 
-Convert_To_AlphaNumeric(df)
-print("Only AlphaNumeric Text -> ", df["Message"][sampleRow])
 
-
-
-from nltk import word_tokenize
-def Tokenize(df):
+def Tokenize(df: pd.DataFrame):
     tokens = []
     for i in range(df["Message"].count()):
         tokens.append(word_tokenize(df["Message"][i]))
     df["tokens"] = tokens
-Tokenize(df)
-print("Tokenized Text -> ", df["tokens"][sampleRow])
 
 
-from nltk.corpus import stopwords
-def RemoveStopword(df):
+def RemoveStopword(df: pd.DataFrame):
     stop_words = set(stopwords.words("english"))
     fil = []
     filters = []
@@ -88,12 +86,8 @@ def RemoveStopword(df):
         filters.append(fil)
     df["Filtered-Stopwords"] = filters
 
-RemoveStopword(df)
-print("Stopwords Removed -> ", df["Filtered-Stopwords"][sampleRow])
 
-
-lem = nltk.WordNetLemmatizer()
-def Lemmantize_Text(df):
+def Lemmantize_Text(df: pd.DataFrame):
     lemmantized = []
     l = []
     for i in range(df["Filtered-Stopwords"].count()):
@@ -104,65 +98,55 @@ def Lemmantize_Text(df):
 
     df["Lemmanted"] = lemmantized
 
-Lemmantize_Text(df)
 
-print("Lemmatization -> ", df["Lemmanted"][sampleRow])
-
-
-def FinalizeText(df):
+def FinalizeText(df: pd.DataFrame):
     text = []
     for i in range(df["Lemmanted"].count()):
         t = ' '.join(df["Lemmanted"][i])
         text.append(t)
     df["Processed_Text"] = text
 
-FinalizeText(df)
-print("Original text -> ",df["v2"][sampleRow])
-print("Processed text -> ",df["Processed_Text"][sampleRow])
-
-
-#Encoding the output using label encoder
-label_encoder = LabelEncoder()
-encoded = label_encoder.fit_transform(df["v1"])
-df["labels"] = encoded
-
 
 def RemoveUnwantedColumn(df):
-    df.drop(['v1','v2', 'Message','tokens', 'Filtered-Stopwords','Lemmanted'], axis=1, inplace=True)
-RemoveUnwantedColumn(df)
-
-print(df.columns)
+    df.drop(['v1', 'v2', 'Message', 'tokens', 'Filtered-Stopwords',
+            'Lemmanted'], axis=1, inplace=True)
 
 
-y = df["labels"]
-x = df.drop(columns="labels", axis=1)
-x_train, x_test, y_train, y_test = train_test_split(x,y,train_size=0.8,test_size=0.2,random_state=10)
-
-def TF_IDF(dataframe):# Takes the dataframe with columns= Length, Processed_Text
+def TF_IDF(df: pd.DataFrame):  # Takes the dataframe with columns= Length, Processed_Text
     TF = TfidfVectorizer(use_idf=True, max_features=3000)
-    feq = pd.DataFrame(TF.fit_transform(dataframe["Processed_Text"]).todense(), columns=[TF.get_feature_names_out()])
+    feq = pd.DataFrame(TF.fit_transform(
+        df["Processed_Text"]).todense(), columns=[TF.get_feature_names_out()])
     print(TF.get_feature_names_out())
-    feq["Length"] = np.array(dataframe["Length"])
-    feq["Length"].replace('NaN',230, inplace=True)
+    feq["Length"] = np.array(df["Length"])
+    feq["Length"].replace('NaN', 230, inplace=True)
     # print("Count: ",feq["Length"].isna().sum())
     # print(feq)
     return feq
 
-xtrain = TF_IDF(x_train)
-xtest = TF_IDF(x_test)
 
-print(xtrain.shape)
-print(xtest.shape)
-
+def FitData(dataf, size):
+    for i in range(dataf.shape[1], size+1):
+        dataf[f"{i}"] = 0.0
 
 
+def clean(df: pd.DataFrame) -> list[np.array]:
+    Remove_Empty_Columns(df)
+    Calculate_Length(df)
+    Convert_To_AlphaNumeric(df)
+    Tokenize(df)
+    RemoveStopword(df)
+    Lemmantize_Text(df)
+    FinalizeText(df)
+    encoded = label_encoder.fit_transform(df["v1"])
+    df["labels"] = encoded
+    RemoveUnwantedColumn(df)
 
-# def PreProcess_Data(dataf):
-#     Calculate_Length(dataf)
-#     Tokenize(dataf)
-#     RemoveStopword(dataf)
-#     Lemmantize_Text(dataf)
-#     FinalizeText(dataf)
-#     RemoveUnwantedColumn(dataf)
-#     return Vectorize_And_TFIDFTranform(dataf)
-    
+    y = df["labels"]
+    x = df.drop(columns="labels", axis=1)
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, train_size=0.8, test_size=0.2, random_state=10)
+
+    xtrain = TF_IDF(x_train)
+    xtest = TF_IDF(x_test)
+
+    return xtrain, xtest, y_train, y_test
