@@ -4,9 +4,11 @@ from sklearn.metrics import accuracy_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 import pandas as pd
+import pickle
 
 
 def TF_IDF(df: pd.DataFrame):  # Takes the dataframe with columns= Length, Processed_Text
+    df.fillna("a", inplace=True)
     TF = TfidfVectorizer(use_idf=True, max_features=3000)
     feq = pd.DataFrame(TF.fit_transform(df["Processed_Text"]).todense(), columns=[
                        TF.get_feature_names_out()])
@@ -35,9 +37,21 @@ def model_fit_and_test(df: pd.DataFrame):
     y_preds = model.predict(x_test.values)
     rf_accuracy = accuracy_score(y_test, y_preds)
 
-    print(y_preds, rf_accuracy)
+    print(rf_accuracy)
 
-    return model, rf_accuracy
+    save_model(model)
+
+
+def save_model(model):
+    filename = "email_spam_detection_model.pickle"
+    with open(filename, "wb") as f:
+        pickle.dump(model, f)
+
+
+def load_model(model):
+    filename = "email_spam_detection_model.pickle"
+    with open(filename, "wb") as f:
+        return pickle.load(f)
 
 
 def test():
