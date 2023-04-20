@@ -29,17 +29,6 @@ def initialize():
     nltk.data.path.append('./nltk_downloads')
 
 
-def initialize():
-    # --- lemmatization
-    nltk.download("wordnet", download_dir="./nltk_downloads")
-    nltk.download("punkt", download_dir="./nltk_downloads")  # --- tokenizor
-    nltk.download("stopwords", download_dir="./nltk_downloads")
-    # ---lemmatization
-    nltk.download('omw-1.4', download_dir="./nltk_downloads")
-
-    nltk.data.path.append('./nltk_downloads')
-
-
 def load_dataset() -> pd.DataFrame:
     df = pd.DataFrame(pd.read_csv("spam.csv", encoding="ISO-8859-1"))
     return df
@@ -134,4 +123,4 @@ def clean(df: pd.DataFrame) -> list[np.array]:
     encoded = label_encoder.fit_transform(df["v1"])
     df["labels"] = encoded
     RemoveUnwantedColumn(df)
-    df.to_csv("cleaned.csv")
+    df.to_csv("cleaned.csv", index=False)
