@@ -1,5 +1,3 @@
-import os
-import flask
 from nltk.corpus import stopwords
 from nltk import word_tokenize
 import pandas as pd
@@ -31,21 +29,9 @@ def initialize():
     nltk.data.path.append('./nltk_downloads')
 
 
-<<<<<<< HEAD
 def load_dataset() -> pd.DataFrame:
     df = pd.DataFrame(pd.read_csv("spam.csv", encoding="ISO-8859-1"))
     return df
-=======
-def initialize():
-    # --- lemmatization
-    nltk.download("wordnet", download_dir="./nltk_downloads")
-    nltk.download("punkt", download_dir="./nltk_downloads")  # --- tokenizor
-    nltk.download("stopwords", download_dir="./nltk_downloads")
-    # ---lemmatization
-    nltk.download('omw-1.4', download_dir="./nltk_downloads")
-
-    nltk.data.path.append('./nltk_downloads')
->>>>>>> 52bab62842611cc15d3919b50fd1433c315d62ef
 
 
 # Check for empty columns
@@ -137,10 +123,4 @@ def clean(df: pd.DataFrame) -> list[np.array]:
     encoded = label_encoder.fit_transform(df["v1"])
     df["labels"] = encoded
     RemoveUnwantedColumn(df)
-<<<<<<< HEAD
     df.to_csv("cleaned.csv", index=False)
-=======
-    df.to_csv(os.path.join(flask.current_app.root_path,
-              "datasets", 'cleaned.csv'))
-    return df
->>>>>>> 52bab62842611cc15d3919b50fd1433c315d62ef
