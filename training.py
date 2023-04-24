@@ -43,13 +43,13 @@ def model_fit_and_test(df: pd.DataFrame):
 
 
 def save_model(model):
-    filename = "email_spam_detection_model.pickle"
+    filename = "models/email_spam_detection_model.pickle"
     with open(filename, "wb") as f:
         pickle.dump(model, f)
 
 
 def load_model(model):
-    filename = "email_spam_detection_model.pickle"
+    filename = "models/email_spam_detection_model.pickle"
     with open(filename, "wb") as f:
         return pickle.load(f)
 
