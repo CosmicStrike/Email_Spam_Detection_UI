@@ -1,0 +1,46 @@
+* {
+    box-sizing: border-box;
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title {
+    font-size: 4rem;
+    font-weight: 900;
+    color: rgb(0, 148, 0);
+    text-shadow: 2px 2px 2px;
+}
+
+.container {
+    margin: 2rem auto;
+    width: 80%;
+    height: 40rem;
+    overflow: auto;
+
+}
+
+table {
+    border: 0px;
+}
+
+th {
+    background-color: green;
+    text-align: center;
+    color: white;
+}
+
+th,
+td {
+    border: 1px;
+    padding: 0.4rem;
+}
+
+td {
+    background-color: rgb(224, 224, 224);
+}

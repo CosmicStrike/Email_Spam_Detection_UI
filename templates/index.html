@@ -3,49 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Title</title>
 </head>
 
 <body>
-    <form id="upload_form">
-        <label for="file">Upload</label>
-        <input type="file" id="file" accept=".csv">
-        <input type="submit" id="" value="Upload">
-        <div>
-            showing first 100 items out of {{length}}
-        </div>
-        <div>
-            <a href="/clean?clean=true">Clean this dataset</a>
-        </div>
-        <div>
-            {% if tables %}
-            {% for table in tables %}
-            {{titles[loop.index]}}
-            {{ table|safe }}
-            {% endfor %}
-            {% endif %}
-        </div>
-    </form>
+
+    {% for table in tables %}
+    {{titles[loop.index]}}
+    {{ table|safe }}
+    {% endfor %}
 </body>
-
-<script>
-    document.getElementById("upload_form").addEventListener("submit", async function (e) {
-        e.preventDefault();
-
-        const file = document.getElementById("file").files[0]
-        if (file != undefined) {
-            var formdata = new FormData()
-            formdata.append("file", file)
-            const response = await fetch("/upload", {
-                method: 'POST',
-                body: formdata
-            }).then((response) => response.json())
-        }
-    })
-
-</script>
-
 
 </html>
