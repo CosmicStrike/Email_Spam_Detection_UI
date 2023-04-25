@@ -42,7 +42,12 @@
             const response = await fetch("/upload", {
                 method: 'POST',
                 body: formdata
-            }).then((response) => response.json())
+            })
+            console.log(response)
+
+            if (response.status === 200) {
+                window.location.reload()
+            }
         }
     })
 

@@ -5,6 +5,8 @@ import re
 import nltk
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
+import os
+import flask
 
 re_pattren = r'\b[A-Za-z0-9]+\b'
 
@@ -28,19 +30,9 @@ def initialize():
 
     nltk.data.path.append('./nltk_downloads')
 
-
-
-def initialize():
-    # --- lemmatization
-    nltk.download("wordnet", download_dir="./nltk_downloads")
-    nltk.download("punkt", download_dir="./nltk_downloads")  # --- tokenizor
-    nltk.download("stopwords", download_dir="./nltk_downloads")
-    # ---lemmatization
-    nltk.download('omw-1.4', download_dir="./nltk_downloads")
-
-    nltk.data.path.append('./nltk_downloads')
-
 # Check for empty columns
+
+
 def Remove_Empty_Columns(df: pd.DataFrame):
     empty_cols = []
     for col in df.columns:
@@ -132,4 +124,3 @@ def clean(df: pd.DataFrame) -> list[np.array]:
     df.to_csv(os.path.join(flask.current_app.root_path,
               "datasets", 'cleaned.csv'))
     return df
-
