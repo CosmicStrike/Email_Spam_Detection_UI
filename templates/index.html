@@ -7,32 +7,40 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="/static/css/dataset.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
 
 <body>
+    <div class="title">Email Spam Detection</div>
     <form id="upload_form">
-        <label for="file">Upload</label>
-        <input type="file" id="file" accept=".csv">
-        <input type="submit" id="" value="Upload">
-        <div>
-            showing first 100 items out of {{length}}
-        </div>
-        <div>
-            <a href="/clean?clean=true">Clean this dataset</a>
-        </div>
-        <div>
-            {% if tables %}
-            {% for table in tables %}
-            {{titles[loop.index]}}
-            {{ table|safe }}
-            {% endfor %}
-            {% endif %}
-        </div>
+        <label for="file"
+            style="display: flex; align-items: center; width: 100%; font-size: 20px; padding-top: 10px; padding-bottom: 10px;">
+            <p>Click here to Upload your dataset</p> <span class="material-symbols-outlined">upload_file</span>
+        </label>
+        <input type="file" id="file" hidden accept=".csv">
     </form>
+    {% if tables %}
+    <div style="font-size: 20px;">
+        showing first 100 items out of {{length}}
+    </div>
+    <div style="font-size: 20px;">
+        <a href="/clean?clean=true">Clean this dataset</a>
+    </div>
+    {% endif %}
+    <div>
+        {% if tables %}
+        {% for table in tables %}
+        {{titles[loop.index]}}
+        {{ table|safe }}
+        {% endfor %}
+        {% endif %}
+    </div>
 </body>
 
 <script>
-    document.getElementById("upload_form").addEventListener("submit", async function (e) {
+    document.getElementById("file").addEventListener("change", async function (e) {
         e.preventDefault();
 
         const file = document.getElementById("file").files[0]

@@ -4,6 +4,8 @@ import pandas as pd
 import os
 import flask
 import dataCleaning
+import training
+
 
 app = Flask(__name__)
 
@@ -33,6 +35,8 @@ def html_table():
         df = pd.read_csv(os.path.join(
             flask.current_app.root_path, "datasets", 'cleaned.csv'))
         return render_template('dataset.html',  tables=[df.to_html(classes='data', index=False)], titles=df.columns.values)
+    else:
+        return render_template('dataset.html')
 
 
 @app.route("/upload", methods=["POST"])
@@ -40,6 +44,35 @@ def upload_csv():
     file = request.files["file"]
     file.save(os.path.join(flask.current_app.root_path, "datasets", 'data.csv'))
     return {"status": "success"}
+
+
+@app.route("/train", methods=["GET"])
+def train():
+    df = pd.read_csv(os.path.join(
+        flask.current_app.root_path, "datasets", 'cleaned.csv'))
+    acc = training.model_fit_and_test(df)
+
+    return {"status": "success", "accuracy": acc}
+
+
+@app.route("/evaluate", methods=["POST"])
+def evaluate():
+    data = flask.request.json
+    model = training.load_model()
+    if model:
+        x = data["email"]
+        x = training.predict(x)
+        if x:
+            return {"status": "success", "result": "spam"}
+        else:
+            return {"status": "success", "result": "not spam"}
+
+
+@app.route("/model")
+def model():
+    if os.path.exists("model.pickle"):
+        return render_template("model.html")
+    return render_template("model.html", redirect=True)
 
 
 if __name__ == '__main__':

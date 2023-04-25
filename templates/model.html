@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        button:hover {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    {% if redirect %}
+    <a href="/clean">No Model trained yet click here to train the model</a>
+    {% else %}
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <p style="font-size: 24px; padding-bottom: 10px;">Enter an Email Body:</p>
+        <textarea id="textarea" style="resize: none; height: 200px; width: 80%;"></textarea>
+        <button id="check"
+            style="font-size: 18px; width: 150px; height: 50px; background-color: #008e00; color: white; font-weight: bold; border-radius: 25px; border: 0px; margin-top: 20px;">Is
+            it spam
+        </button>
+        <p id="result" style="font-size: 24px;"></p>
+    </div>
+    {% endif %}
+
+
+</body>
+<script>
+    document.getElementById("check").addEventListener("click", async function () {
+        const email = document.getElementById("textarea").value
+        document.getElementById("result").innerHTML = ``
+
+        const response = await fetch("/evaluate", {
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({ email: email })
+        })
+
+        if (response.status === 200) {
+            data = await response.json()
+            document.getElementById("result").innerHTML = `The email appears ${data.result}`
+        }
+    })
+</script>
+
+</html>

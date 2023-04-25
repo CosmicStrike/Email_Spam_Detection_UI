@@ -7,6 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link href="/static/css/dataset.css" rel="stylesheet">
+    <style>
+        button:hover {
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
@@ -25,13 +30,31 @@
     </div>
 
     <div>
-        <button></button>
+        <button id="train"
+            style="font-size: 18px; width: 130px; height: 50px; background-color: #008e00; color: white; font-weight: bold; border-radius: 25px; border: 0px;">
+            train model
+        </button>
+        <button id="train"
+            style="font-size: 18px; width: 150px; height: 50px; background-color: #008e00; color: white; font-weight: bold; border-radius: 25px; border: 0px;">
+            <a href="/model" style="text-decoration: none; color: white;">evaluate model</a>
+        </button>
     </div>
+    <div id="training" style="margin-top: 10px; font-size: 20px;"></div>
 </body>
 
 
 <script>
-
+    document.getElementById("train").addEventListener("click", async function () {
+        document.getElementById("training").innerHTML = "Training model please wait..."
+        const response = await fetch("/train", {
+            method: "GET"
+        })
+        console.log(response)
+        if (response.status == 200) {
+            data = await response.json()
+            document.getElementById("training").innerHTML = "Training complete <br> Model accuracy is " + data.accuracy + "<br><a href = '/model'>click here to evaluate</a>"
+        }
+    })
 </script>
 
 </html>
