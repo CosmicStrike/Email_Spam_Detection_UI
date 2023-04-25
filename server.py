@@ -1,10 +1,10 @@
 from flask import Flask, request, render_template, session, redirect
 import numpy as np
 import pandas as pd
-import flask
-import os
-import dataCleaning
+
+
 app = Flask(__name__)
+
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -18,7 +18,8 @@ def index():
         return render_template("index.html")
 
 
-@app.route('/clean', methods=("POST", "GET"))
+
+@app.route('/', methods=("POST", "GET"))
 def html_table():
     clean = request.args.get('clean')
     if clean and os.path.exists(os.path.join(flask.current_app.root_path, "datasets", 'data.csv')):
@@ -39,7 +40,6 @@ def upload_csv():
     file = request.files["file"]
     file.save(os.path.join(flask.current_app.root_path, "datasets", 'data.csv'))
     return {"status": "file successfully uploaded"}
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000, debug=True)

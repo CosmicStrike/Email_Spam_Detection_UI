@@ -1,5 +1,3 @@
-import os
-import flask
 from nltk.corpus import stopwords
 from nltk import word_tokenize
 import pandas as pd
@@ -31,6 +29,7 @@ def initialize():
     nltk.data.path.append('./nltk_downloads')
 
 
+
 def initialize():
     # --- lemmatization
     nltk.download("wordnet", download_dir="./nltk_downloads")
@@ -40,7 +39,6 @@ def initialize():
     nltk.download('omw-1.4', download_dir="./nltk_downloads")
 
     nltk.data.path.append('./nltk_downloads')
-
 
 # Check for empty columns
 def Remove_Empty_Columns(df: pd.DataFrame):
@@ -134,3 +132,4 @@ def clean(df: pd.DataFrame) -> list[np.array]:
     df.to_csv(os.path.join(flask.current_app.root_path,
               "datasets", 'cleaned.csv'))
     return df
+
