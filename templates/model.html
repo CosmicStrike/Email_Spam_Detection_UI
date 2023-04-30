@@ -45,7 +45,12 @@
 
         if (response.status === 200) {
             data = await response.json()
-            document.getElementById("result").innerHTML = `The email appears ${data.result}`
+            if (data.result == 1) {
+                document.getElementById("result").innerHTML = `The email is classified as NOT SPAM with a confidence of ${data.prob[0] * 100}%`
+            }
+            else {
+                document.getElementById("result").innerHTML = `The email is classified as SPAM with a confidence of ${data.prob[1] * 100}%`
+            }
         }
     })
 </script>

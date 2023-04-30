@@ -14,8 +14,9 @@ app = Flask(__name__)
 def index():
     if os.path.exists(os.path.join(flask.current_app.root_path, "datasets", 'data.csv')):
         df = pd.read_csv(os.path.join(
-            flask.current_app.root_path, "datasets", 'data.csv')).head(100)
+            flask.current_app.root_path, "datasets", 'data.csv'))
         length = df.size
+        df = df.head(100)
         return render_template('index.html',  tables=[df.to_html(classes='data', index=False)], titles=df.columns.values, length=length)
     else:
         return render_template("index.html")
@@ -62,10 +63,8 @@ def evaluate():
     if model:
         x = data["email"]
         x = training.predict(x)
-        if x:
-            return {"status": "success", "result": "spam"}
-        else:
-            return {"status": "success", "result": "not spam"}
+        print(x)
+        return {"status": "success", "result": x[0][0], "prob": list(x[1][0])}
 
 
 @app.route("/model")

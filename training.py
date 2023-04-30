@@ -108,9 +108,9 @@ def predict(email):
 
     df = TF_IDF_test(TF, df)
 
-    model = load_model()
+    model: RandomForestClassifier = load_model()
     if model:
-        return model.predict(df)
+        return [model.predict(df),model.predict_proba(df)]
 
     return 0
 
