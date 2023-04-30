@@ -11,9 +11,48 @@
             cursor: pointer;
         }
     </style>
+    <style>
+        nav {
+            background-color: green;
+            height: 60px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        ul {
+            list-style: none;
+            display: flex;
+            margin-top: 20px;
+            padding: 0;
+        }
+
+        li {
+            margin: 0 10px;
+        }
+
+        li>a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: bold;
+            padding: 15px;
+        }
+
+        li>a:hover {
+            background-color: black;
+        }
+    </style>
 </head>
 
-<body>
+<body style="margin: 0;">
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/clean">Clean and train</a></li>
+            <li><a href="/model">Evaluate</a></li>
+        </ul>
+    </nav>
     {% if redirect %}
     <a href="/clean">No Model trained yet click here to train the model</a>
     {% else %}
@@ -45,7 +84,7 @@
 
         if (response.status === 200) {
             data = await response.json()
-            if (data.result == 1) {
+            if (data.result == 0) {
                 document.getElementById("result").innerHTML = `The email is classified as NOT SPAM with a confidence of ${data.prob[0] * 100}%`
             }
             else {

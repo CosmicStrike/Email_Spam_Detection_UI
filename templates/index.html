@@ -10,9 +10,49 @@
     <link rel="stylesheet" href="/static/css/dataset.css">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        nav {
+            background-color: green;
+            height: 60px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        ul {
+            list-style: none;
+            display: flex;
+            margin-top: 20px;
+            padding: 0;
+        }
+
+        li {
+            margin: 0 10px;
+        }
+
+        li>a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: bold;
+            padding: 15px;
+        }
+
+        li>a:hover {
+            background-color: black;
+        }
+    </style>
 </head>
 
 <body>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/clean">Clean and train</a></li>
+            <li><a href="/model">Evaluate</a></li>
+        </ul>
+    </nav>
+
     <div class="title">Email Spam Detection</div>
     <form id="upload_form">
         <label for="file"
@@ -29,13 +69,15 @@
         <a href="/clean?clean=true">Clean this dataset</a>
     </div>
     {% endif %}
-    <div>
-        {% if tables %}
-        {% for table in tables %}
-        {{titles[loop.index]}}
-        {{ table|safe }}
-        {% endfor %}
-        {% endif %}
+    <div class="container">
+        <div>
+            {% if tables %}
+            {% for table in tables %}
+            {{titles[loop.index]}}
+            {{ table|safe }}
+            {% endfor %}
+            {% endif %}
+        </div>
     </div>
 </body>
 

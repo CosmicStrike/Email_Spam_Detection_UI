@@ -63,8 +63,7 @@ def evaluate():
     if model:
         x = data["email"]
         x = training.predict(x)
-        print(x)
-        return {"status": "success", "result": x[0][0], "prob": list(x[1][0])}
+        return {"status": "success", "result": int(x[0][0]), "prob": list(x[1][0])}
 
 
 @app.route("/model")
