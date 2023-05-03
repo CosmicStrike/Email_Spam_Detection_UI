@@ -2,3 +2,4 @@ venv
 .vscode
 __pycache__
 nltk_downloads
+test
