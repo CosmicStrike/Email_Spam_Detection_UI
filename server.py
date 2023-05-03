@@ -5,7 +5,10 @@ import os
 import flask
 import dataCleaning
 import training
-
+import seaborn as sns
+from io import BytesIO
+import base64
+import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 
@@ -25,17 +28,28 @@ def index():
 @app.route('/clean', methods=("POST", "GET"))
 def html_table():
     clean = request.args.get('clean')
-    if clean and os.path.exists(os.path.join(flask.current_app.root_path, "datasets", 'data.csv')):
+
+    if os.path.exists(os.path.join(flask.current_app.root_path, "datasets", 'data.csv')):
         df = pd.read_csv(os.path.join(
             flask.current_app.root_path, "datasets", 'data.csv'))
-        dataCleaning.initialize()
-        df = dataCleaning.clean(df)
-        return render_template('dataset.html',  tables=[df.to_html(classes='data', index=False)], titles=df.columns.values)
+        if os.path.exists(os.path.join(flask.current_app.root_path, "datasets", 'cleaned.csv')):
+            df2 = pd.read_csv(os.path.join(
+                flask.current_app.root_path, "datasets", 'cleaned.csv'))
+        else:
+            dataCleaning.initialize()
+            df2 = dataCleaning.clean(df)
 
-    elif os.path.exists(os.path.join(flask.current_app.root_path, "datasets", 'cleaned.csv')):
-        df = pd.read_csv(os.path.join(
-            flask.current_app.root_path, "datasets", 'cleaned.csv'))
-        return render_template('dataset.html',  tables=[df.to_html(classes='data', index=False)], titles=df.columns.values)
+        if clean:
+            dataCleaning.initialize()
+            df2 = dataCleaning.clean(df)
+
+        plt.switch_backend("agg")
+        plot = sns.histplot(data=df, x=df2.Length, hue="v1").get_figure()
+
+        buf = BytesIO()
+        plot.savefig(buf, format="png")
+        data = base64.b64encode(buf.getbuffer()).decode("ascii")
+        return render_template('dataset.html',  tables=[df2.to_html(classes='data', index=False)], titles=df.columns.values, figure=data)
     else:
         return render_template('dataset.html')
 
