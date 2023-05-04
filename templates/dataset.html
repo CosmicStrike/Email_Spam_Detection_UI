@@ -43,6 +43,20 @@
         li>a:hover {
             background-color: black;
         }
+
+        .graph {
+            border-style: solid;
+            border-width: 0.2rem;
+
+            padding: 1rem;
+            margin: 1rem;
+        }
+
+        .graph p {
+            font-size: large;
+            font-weight: 800;
+            margin: 0.6rem;
+        }
     </style>
 </head>
 
@@ -67,10 +81,31 @@
         </div>
         {% endif %}
     </div>
-    <img src="data:image/png;base64,{{figure}}">
-    <img src="data:image/png;base64,{{spamchart}}">
-	<img src="data:image/png;base64,{{hamchart}}">
-	
+    <h1>Insights from dataset</h1>
+    <div class="graph">
+        <h1>Length</h1>
+        <img src="data:image/png;base64,{{figure}}">
+        <h2>About the graph</h2>
+        <p>This graph shows how the length of an email varies for a ham email and spam email</p>
+        <p>X-axis denotes the length of an email </p>
+        <p>Y-axis denotes the count of emails which are either spam or ham for that given length </p>
+    </div>
+    <div class="graph">
+        <h1>Spam Words</h1>
+        <img src="data:image/png;base64,{{spamchart}}">
+        <h2>About the graph</h2>
+        <p>This pie diagram shows the weights/importance of a words given for a spam emails</p>
+        <p>More the importance for that word, more likely it is that the email containing this word is spam</p>
+        <p>These values are based on IDF weights given by TF-IDF</p>
+    </div>
+    <div class="graph">
+        <h1>Ham Words</h1>
+        <img src="data:image/png;base64,{{hamchart}}">
+        <h2>About the graph</h2>
+        <p>This pie diagram shows the weights/importance of a words given for a ham emails</p>
+        <p>More the importance for that word, more likely it is that the email containing this word is ham</p>
+        <p>These values are based on IDF weights given by TF-IDF</p>
+    </div>
     <div>
         <button id="train"
             style="font-size: 18px; width: 130px; height: 50px; background-color: #008e00; color: white; font-weight: bold; border-radius: 25px; border: 0px;">
