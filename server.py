@@ -45,7 +45,7 @@ def html_table():
             df2 = dataCleaning.clean(df)
 
         plt.switch_backend("agg")
-        plot = sns.histplot(data=df, x=df2.Length, hue="v1").get_figure()
+        plot = sns.histplot(data=df2, x=df2.Length, hue="labels").get_figure()
 
         buf = BytesIO()
         plot.savefig(buf, format="png")
